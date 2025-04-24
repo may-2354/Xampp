@@ -1,3 +1,140 @@
+ASSIGNMENT NO.1
+Write a program to simulate use of Linux commands like cp, grep with the usage of fork() and exec() system calls. Also show the usage of wait(), getpid() and exit() system calls.
+Program:
+1) Program for ‘grep’ command
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+int main(int argc, char *argv[]) {
+if(argc < 3) {
+printf("\nCommand line arguments are less than 3....\n");
+printf("Exiting program\n");
+return 0;
+}
+const char *pattern = argv[1];
+const char *filename = argv[2];
+FILE *fptr;
+fptr = fopen("demo.txt", "r");
+if(fptr == NULL) {
+printf("The file is not opened. The program exits...");
+return 0;
+}
+else {
+char line[1024];
+int line_number = 0;
+while(fgets(line, sizeof(line), fptr) != NULL) {
+line_number += 1;
+if(strstr(line, pattern) != NULL) {
+printf("Line %d : %s",line_number, line);
+}
+}
+}
+printf("\n");
+fclose(fptr);
+return 0;
+}
+2) Program for ‘cp’ command:-
+#include<stdio.h>
+#include<stdlib.h>
+int main(int argc, char *argv[]) {
+if(argc < 3) {
+printf("Commnads are less than 3...\n");
+printf("Exiting Program...");
+return 0;
+}
+else {
+char *srcfile = argv[1];
+char *desfile = argv[2];
+FILE *src = fopen(srcfile, "r");
+FILE *des = fopen(desfile, "w");
+if(src==NULL || des==NULL) {
+printf("NO File, not opening....\n");
+printf("Exiting Program...");
+return 0;
+}
+char buffer[1000];
+while(fgets(buffer, 1000, src)) {
+fputs(buffer, des);
+}
+printf("Copied contents from file1 to file2 successfully..\n");
+printf("Closing the files\n");
+fclose(src);
+fclose(des);
+printf("Exiting Program...\n");
+}
+}
+3) Program for ‘fork’ command
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/wait.h>
+void simulateCopy(char *argv1, char *argv2) {
+pid_t pid = fork();
+if(pid < 0) {
+printf("Fork failed...\n");
+}
+if(pid == 0) {
+printf("\nThis is the child process....\n");
+execlp("./copy", "copy", argv1, argv2, NULL);
+}
+else {
+wait(NULL);
+printf("\nChild process terminated...\n");
+printf("This is parent process\n");
+}
+}
+void simulateGrep(char *argv1, char *argv2) {
+pid_t pid = fork();
+if(pid<0) {
+printf("Fork failed");
+exit(1);
+}
+else if(pid==0) {
+printf("\nThis is child process\n");
+execlp("./grep", ".grep", argv1, argv2, NULL);
+}
+else {
+wait(NULL);
+printf("\nChild process terminated..\n");
+printf("This is parent process\n");
+}
+}
+int main(int argc, char* argv[]) {
+int choice;
+printf("1. Copy command\n");
+printf("2. Grep command\n");
+printf("Enter the option you want to execute : \n");
+scanf("%d", &choice);
+switch(choice) {
+case 1 :
+{
+char src[10], des[10];
+printf("Enter src filename : ");
+scanf("%s", src);
+printf("Enter des filename : ");
+scanf("%s", des);
+simulateCopy(src, des);
+break;
+}
+case 2 :
+{
+char pattern[20], filename[20];
+printf("Enter filename : ");
+scanf("%s", filename);
+printf("Enter pattern to search : ");
+scanf("%s", pattern);
+simulateGrep(pattern, filename);
+break;
+}
+default :
+{
+printf("Exiting Program....\n");
+break;
+}
+}
+return 0;
+}
+---------------------------------------------------------------------
 copy.cpp – Simulates the cp command
 // copy.cpp
 #include <iostream>
@@ -619,6 +756,7 @@ cout << "Parent received from child: " << result;
 }
 return 0;
 }
+//run ./pipe_comm "Hello World"
 ________________________________________________________________________________________________
 ASSIGNMENT NO 4
 #include <iostream>
@@ -715,6 +853,8 @@ int main() {
     cout << "\nSimulation Completed!\n";
     return 0;
 }
+//compile like this g++ bank_simulation.cpp -o bank_simulation -lpthread
+
 _______________________________________________________________________________________
 ASSIGNMENT NO 5
 Write a program to implement Banker’s Algorithm for deadlock avoidance.
